@@ -10,3 +10,5 @@ class Player:
             return f'{self.name}:{self.score}'
         def add_Player(self, name,x,y):
             return f'{self.name}'
+        def add_Score(self,name,score):
+            return f'{self.name}:{self.score}'
