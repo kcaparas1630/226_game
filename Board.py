@@ -11,8 +11,8 @@ class Board:
         if n <= 0 or t < 0 or min_val < 0 or max_val <= min_val:
             raise ValueError("Invalid argument values.")
         # Check that maximum players is not negative nor greater than n
-        if 0 >= max_players <= n:
-            raise ValueError("Value must be in Range")
+        if max_players < 2:
+            raise ValueError("players must not be less than 2")
 
         self.max_players = max_players
         self.n = n
@@ -23,12 +23,13 @@ class Board:
         self.treasures = self.create_treasures()  # instance method inside init
         self.treasurePositions = self.create_treasure_positions()  # instance method inside init
         self.tile = Tile(".", 0, t)
+        self.treasuresFound = set()  # Create a set to store found treasures
 
     def create_treasures(self):  # method to generate treasure class returns an list called treasures
         treasures = []
         for _ in range(self.t):
             description = '$'
-            value = random.randint(100, 500)  # Assign value of 100 - 500 for value of treasures
+            value = random.randint(5, 10)  # Assign value of 5 - 10 for value of treasures
             treasures.append(Treasure(description, value))  # Insert values to treasure class
         return treasures
 
@@ -43,8 +44,7 @@ class Board:
         return treasurePositions
 
     def add_player(self, name, x, y):  # method to add player accepts parameters name, and x, y coordinates. Void return
-        if (0 >= x > self.n) or (
-                0 >= y > self.n):  # condition to check if x or y coordinate is less than or equal to 0  or greater than 10
+        if (x < 0) or (y < 0) or (x >= self.n) or (y >= self.n):  # condition to check if x or y coordinate is less than or equal to 0  or greater than 10
             raise ValueError("Position is out of bounds")
 
         for player in self.players:  # self.players is an array created in the init method
@@ -84,7 +84,7 @@ class Board:
             raise ValueError("Invalid direction")
 
         # Check if the new position is out of bounds
-        if (0 >= new_x > self.n) or (0 >= new_y > self.n):
+        if (new_x < 0) or (new_y < 0) or (new_x >= self.n) or (new_y >= self.n):
             raise ValueError("Cannot move out of bounds")
 
         # Check if the new position is already occupied by another player
@@ -111,22 +111,26 @@ class Board:
         return boardPrint
 
     def check_for_treasure(self):
-        treasuresFound = set()  # Create a set to store found treasures
+        #treasuresFound = set()  # Create a set to store found treasures
         treasures = self.create_treasures()
         treasuresVal = treasures[0]  # variable initialized to get value of treausre.
+        treasure_positions_copy = self.treasurePositions.copy()
+        treasuresToRemove = set()  # Create a set to store treasures to be removed
+
         for player in self.players:
             x, y = player.x, player.y
 
-            for row, col in self.treasurePositions:
+            for row, col in treasure_positions_copy:
                 if x == col and y == row:
                     # Player found treasure at the same coordinates
                     player.score += treasuresVal.value
-                    treasuresFound.add((row, col))  # Add the found treasure to the set
+                    self.treasuresFound.add((row, col))  # Add the found treasure to the set
                     # Print the player's name and updated score
                     print(f"Player {player.name} has found a treasure! Score: {player.score}")
+                    treasuresToRemove.add((row, col))  # Add the treasure to the removal set
 
         # Remove the found treasures from the main set
-        for treasure in treasuresFound:
+        for treasure in treasuresToRemove:
             self.treasurePositions.remove(treasure)
-        if (treasuresFound == 5):
+        if (len(self.treasuresFound) == 5):
             print(f"Game is over")

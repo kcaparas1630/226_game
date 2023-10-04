@@ -7,7 +7,7 @@ if __name__ == '__main__':
     boardInstance.add_player("1", 4, 5)
     boardInstance.add_player("2", 5, 5)
 
-    currentPlayer = "1"  # Initialize with player 1
+    currentPlayer = input("Choose a player: ")  # Initialize with player 1
 
     while True:
         # Display the board at the beginning of each turn
