@@ -9,6 +9,11 @@ class Player:
         def __str__(self):
             return f'{self.name}:{self.score}'
         def add_Player(self, name,x,y):
+            self.name = name
+            self.x = x
+            self.y = y
             return f'{self.name}'
-        def add_Score(self,name,score):
-            return f'{self.name}:{self.score}'
+        def add_Score(self,score):
+            self.score += score
+            print(f'The score is {score}')
+            return self.score

@@ -54,6 +54,17 @@ class Board:
         new_player = Player(name, x, y)  # instance method of player class
         self.players.append(new_player)  # append player instance to self.players array
 
+    def add_Score(self, name, score):
+        # Find the player with the given name
+        for player in self.players:
+            if player.name == name:
+                # Update the player's score using the add_Score method
+                player.add_Score(score)
+                print(f"Player {name}'s score is now: {player.score}")
+                break
+        else:
+            print(f"Player {name} not found. New player created with a score of {score}.")
+
     def move_player(self, name,
                     direction):  # Method to move player accepts parameters name, and direction(up, down, right, left)
         movePlayer = None  # initializing variable to none for looping
@@ -123,7 +134,8 @@ class Board:
             for row, col in treasure_positions_copy:
                 if x == col and y == row:
                     # Player found treasure at the same coordinates
-                    player.score += treasuresVal.value
+                    score_to_add = treasuresVal.value
+                    self.add_Score(player.name, score_to_add)
                     self.treasuresFound.add((row, col))  # Add the found treasure to the set
                     # Print the player's name and updated score
                     print(f"Player {player.name} has found a treasure! Score: {player.score}")

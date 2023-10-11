@@ -7,18 +7,17 @@ if __name__ == '__main__':
     boardInstance.add_player("1", 4, 5)
     boardInstance.add_player("2", 5, 5)
 
-    currentPlayer = input("Choose a player: ")  # Initialize with player 1
-
     while True:
+
         # Display the board at the beginning of each turn
         boardMap = boardInstance.display()
 
         for row in boardMap: #creates mapping of the board
             print(' '.join(row))
-
+        currentPlayer = input("Choose a player: ")  # Initialize with player 1
         while True:
             try:
-                playerMovement = input(f"(U)p (L)eft (R)ight (D)own (Q)uit? ")
+                playerMovement = input(f"Player {currentPlayer} (U)p (L)eft (R)ight (D)own (Q)uit? ")
                 boardInstance.move_player(currentPlayer, playerMovement)
                 break  #break inner loop if input is valid
             except ValueError as e:

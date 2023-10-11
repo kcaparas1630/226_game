@@ -83,6 +83,31 @@ def test_board():
     with pytest.raises(ValueError, match="Position is already occupied by another player"):
         board.move_player("1", "L")
 
+def test_check_Score():
+    player1 = Player("1", 1, 1)
+    player1.add_Score(5)
+    # Now check the score using the Player's attribute
+    assert player1.score == 5
+
+def test_score_increment_when_finding_treasure():
+    # Create a board with known parameters
+    board = Board(10, 5, 0, 9, 2)
+
+    # Add a player to a known position
+    player1 = Player("1", 1, 1)
+    board.players = [player1]
+    # Set a known treasure position
+    board.treasurePositions = {(1, 1)}  # Assuming this is the position where the player is expected to find treasure
+    # Ensure that the treasuresFound set is initially empty
+    assert len(board.treasuresFound) == 0
+    # Ensure that the player's score is initially 0
+    assert player1.score == 0
+    # Simulate the player moving to the treasure position
+    board.check_for_treasure()
+    # Check that the player's score has been updated
+    assert player1.score > 0
+
+
 def test_check_for_treasure_remove():
     board = Board(10, 5, 0, 9, 2)
     player1 = Player("1", 1, 1)
@@ -91,16 +116,7 @@ def test_check_for_treasure_remove():
     board.check_for_treasure()
     assert (1,1) not in board.treasurePositions
 
-"""def test_check_for_treasure_game_over():
-    board = Board(10, 5, 0, 9, 2)
-    players = [Player(name=f"Player{i}", x=i, y=i) for i in range(1,3)]
-    board.players = players
-    treasuresFound = set()
-    board.treasurePositions = {(i, i) for i in range(1, 6)}
-    for player in players:
-        board.check_for_treasure()
-    assert treasuresFound == 5
-"""
+
 
 def test_check_for_treasure_game_over():
     board = Board(10, 5, 0, 9, 2)
