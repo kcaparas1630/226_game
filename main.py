@@ -103,36 +103,23 @@ class Game:
                         # Handle different commands
                         print(f'commands before  {commands}')
                         if commands == 0b0010:  # U
-                            print('Player pos before: %d, %d' % (self.board_instance.players[0].x, self.board_instance.players[0].y))
                             self.board_instance.move_player(str_player_number, str_commands)
-                            print('Player pos after: %d, %d' % (self.board_instance.players[0].x, self.board_instance.players[0].y))
                             pass
                         elif commands == 0b0100:  # L
                             # Handle L command
-                            print('Player pos before: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             self.board_instance.move_player(str_player_number, str_commands)
-                            print('Player pos after: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             pass
                         elif commands == 0b0110:  # R
                             # Handle R command
-                            print('Player pos before: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             self.board_instance.move_player(str_player_number, str_commands)
-                            print('Player pos after: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             pass
                         elif commands == 0b0011:  # D
                             # Handle D command
-                            print('Player pos before: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             self.board_instance.move_player(str_player_number, str_commands)
-                            print('Player pos after: %d, %d' % (
-                            self.board_instance.players[0].x, self.board_instance.players[0].y))
                             pass
                         elif commands == 0b1000:  # Q
                             # Handle Q command
+                            self.board_instance.move_player(str_player_number, str_commands)
                             pass
                         elif commands == 0b1111:  # G
                             # Handle G command
@@ -157,10 +144,7 @@ class Game:
             try:
                 sock.connect((HOST,PORT))
                 print('Client: ', sock.getsockname())
-                #player_number &= 0b01
 
-                # Create the 1-byte segment
-                #byte_segment = ((self.command_mapping[command] & 0xF0) | (player_number << 2)).to_bytes(1,byteorder='big')
                 commandBits = b''
                 if command == 'G':
                     commandBits = bytes([0b11110100])
@@ -204,7 +188,7 @@ class Game:
                 print('Reply: ', reply)
             except Exception as details:
                 raise details
-                #print(f'Error: {details}')
+
             finally:
                 sock.close()
 
