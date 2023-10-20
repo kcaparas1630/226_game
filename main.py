@@ -50,11 +50,14 @@ if __name__ == '__main__':
 """
 from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from sys import argv
+import struct
+
+import test_server
 from Board import Board
 
 class Game:
     def __init__(self):
-        self.board_instance = Board(10, 5, 0, 9, 2)
+        self.board_instance = Board(20, 5, 0, 9, 2)
         self.board_instance.add_player("1", 4, 5)
         self.board_instance.add_player("2", 5, 5)
         self.command_mapping = {'U': 0b0010, 'L': 0b0100, 'R': 0b0110, 'D': 0b0011, 'Q': 0b1000, 'G': 0b1111}
@@ -62,7 +65,7 @@ class Game:
 
     def create_server(self):
         BUF_SIZE = 1024
-        HOST = '127.0.0.1'
+        HOST = ''
         PORT = 12345
 
         with socket(AF_INET, SOCK_STREAM) as sock:
@@ -74,8 +77,7 @@ class Game:
                 try:
                     sc, address = sock.accept()
                     with sc:
-                        client_ip, client_port = address
-                        print('Client connected:', address)
+                        print('Client connected:', sc.getpeername())
 
                         # Receive 1-byte segment
                         data = sc.recv(1)
@@ -88,49 +90,62 @@ class Game:
                         commands = (data[0] & 0xF0) >> 4
 
                         player_number = (data[0] & 0x0C) >> 2
-                        """
-                        unused_bits = data[0] & 0x03
-
-                        if unused_bits != 0:
-                            print('Invalid command. Closing connection.')
-                            break
-                        """
 
                         print(f'Received: Command={commands}, Player={player_number}')
 
                         str_player_number = str(player_number)
                         str_commands = next(key for key, value in self.command_mapping.items() if value == commands)
                         # Handle different commands
-                        print(f'commands before  {commands}')
                         if commands == 0b0010:  # U
                             self.board_instance.move_player(str_player_number, str_commands)
-                            pass
+
                         elif commands == 0b0100:  # L
                             # Handle L command
                             self.board_instance.move_player(str_player_number, str_commands)
-                            pass
+
                         elif commands == 0b0110:  # R
                             # Handle R command
                             self.board_instance.move_player(str_player_number, str_commands)
-                            pass
+
                         elif commands == 0b0011:  # D
                             # Handle D command
                             self.board_instance.move_player(str_player_number, str_commands)
-                            pass
+
                         elif commands == 0b1000:  # Q
                             # Handle Q command
-                            self.board_instance.move_player(str_player_number, str_commands)
+                            sock.close()
                             pass
                         elif commands == 0b1111:  # G
                             # Handle G command
                             boardMap = self.board_instance.display()
                             for row in boardMap:  # creates mapping of the board
                                 print(' '.join(row))
-                            pass
+                            # Convert the boardMap to a UTF-8 encoded string
+                            board_str = ' '.join([' '.join(row) for row in boardMap])
+                            board_bytes = board_str.encode('utf-8')
+                            self.board_instance.check_for_treasure()
+                            player1 = self.board_instance.players[0]
+                            player2 = self.board_instance.players[1]
+
+                            print(f"Player 1 Score: {player1.score}")
+                            print(f"Player 2 Score: {player2.score}")
+                            treasures = self.board_instance.create_treasures()
+                            for treasure in treasures:
+                                print(f"Treasure Description: {treasure.description}, Value: {treasure.value}")
+                            self.board_instance.check_for_treasure()
+                            # Pack Player 1 and Player 2 scores as unsigned shorts
+                            #packed_scores = struct.pack('!HH', player1.score , player2.score)
+                            player_score = struct.pack('!HH', player1.score, player2.score)
+                            sc.sendall(player_score + board_bytes)
+                            #self.check_treasures()
+
+                            # Send the UTF-8 encoded board to the client
+
+
                         else:
                             print('Unknown command. Closing connection.')
                             break
-                        self.check_treasures()
+
 
                 except Exception as details:
                     raise details
@@ -182,10 +197,23 @@ class Game:
                         print("No player exists")
                 elif command == 'Q':
                     commmandBits = bytes([0b10000100])
+
                 # Send the 1-byte segment to the server
                 sock.sendall(commandBits)
-                reply = sock.recv(BUF_SIZE)
-                print('Reply: ', reply)
+                if command == 'T':
+                    # Receive the packed scores from the server
+                    packed_scores = sock.recv(4)  # Assuming 2 unsigned shorts (4 bytes in total)
+
+                    # Unpack the scores
+                    player1_score, player2_score = struct.unpack('!HH', packed_scores)
+
+                    print(f'Player 1 Score: {player1_score}')
+                    print(f'Player 2 Score: {player2_score}')
+
+                else:
+                    reply = sock.recv(BUF_SIZE)
+                    print('Reply: ', reply)
+
             except Exception as details:
                 raise details
 
@@ -193,12 +221,18 @@ class Game:
                 sock.close()
 
     def check_treasures(self):
-        self.board_instance.check_for_treasure()
+        """self.board_instance.check_for_treasure()
         player1 = self.board_instance.players[0]
         player2 = self.board_instance.players[1]
 
         print(f"Player 1 Score: {player1.score}")
         print(f"Player 2 Score: {player2.score}")
+
+        # Pack Player 1 and Player 2 scores as unsigned shorts
+        packed_score1 = struct.pack('!H', player1.score)
+        print(packed_score1)
+        packed_score2 = struct.pack('!H', player2.score)
+        sc.sendall(packed_score1 + packed_score2 + board_bytes)
 
         # Check if all treasure has been found
         if not self.board_instance.treasurePositions:
@@ -210,7 +244,7 @@ class Game:
             else:  # if ever it ties that is, but highly doubt it because of random values.
                 print("It's a tie!")
 
-
+        """
 if __name__ == '__main__':
     g = Game()
 
