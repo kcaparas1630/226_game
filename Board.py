@@ -90,22 +90,22 @@ class Board:
             new_x, new_y = x, y - 1
             if new_y < 0:
                 new_y = 0
-                raise ValueError("Cannot move out of bounds")
+                print("Cannot move out of bounds")
         elif (direction == "D") or (direction == "d"):
             new_x, new_y = x, y + 1
             if new_y >= self.n:
                 new_y = 9
-                raise ValueError("Cannot move out of bounds")
+                print("Cannot move out of bounds")
         elif (direction == "L") or (direction == "l"):
             new_x, new_y = x - 1, y
             if new_x < 0:
                 new_x = 0
-                raise ValueError("Cannot move out of bounds")
+                print("Cannot move out of bounds")
         elif (direction == "R") or (direction == "r"):
             new_x, new_y = x + 1, y
             if new_x >= self.n:
                 new_x = 9
-                raise ValueError("Cannot move out of bounds")
+                print("Cannot move out of bounds")
         elif (direction == "Q") or (direction == "q"):
             sys.exit(1)  # force terminates the program
         else:
@@ -114,12 +114,12 @@ class Board:
         # Check if the new position is out of bounds
         if (new_x < 0) or (new_y < 0) or (new_x >= self.n) or (new_y >= self.n):
             print("Player out of bounds", new_x,new_y)
-            raise ValueError("Player out of bounds")
+
 
         # Check if the new position is already occupied by another player
         for player in self.players:
             if player.x == new_x and player.y == new_y:
-                raise ValueError("Position is already occupied by another player")
+                print("Position is already occupied by another player")
 
         # Update the player's position
         movePlayer.x, movePlayer.y = new_x, new_y
