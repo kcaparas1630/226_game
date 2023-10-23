@@ -24,6 +24,12 @@ class Board:
         self.treasurePositions = self.create_treasure_positions()  # instance method inside init
         self.tile = Tile(".", 0, t)
         self.treasuresFound = set()  # Create a set to store found treasures
+        self.treasuresToRemove = set()  # Create a set to store treasures to be removed
+        self.game_over = False
+
+    def is_game_over(self):
+        return self.game_over
+
 
     def create_treasures(self):  # method to generate treasure class returns an list called treasures
         treasures = []
@@ -33,8 +39,7 @@ class Board:
             treasures.append(Treasure(description, value))  # Insert values to treasure class
         return treasures
 
-    def create_treasure_positions(
-            self):  # method to generate random position of treasures return a set collection of treasures
+    def create_treasure_positions(self):  # method to generate random position of treasures return a set collection of treasures
         treasurePositions = set()
         while len(
                 treasurePositions) < self.t:  # Will continue to loop while treasure.positions is less than treasures (5)
@@ -83,25 +88,38 @@ class Board:
         # Define the new position based on the direction
         if (direction == "U") or (direction == "u"):
             new_x, new_y = x, y - 1
+            if new_y < 0:
+                new_y = 0
+            print(new_x,new_y)
         elif (direction == "D") or (direction == "d"):
             new_x, new_y = x, y + 1
+            if new_y >= self.n:
+                new_y = 9
+            print(new_x, new_y)
         elif (direction == "L") or (direction == "l"):
             new_x, new_y = x - 1, y
+            if new_x < 0:
+                new_x = 0
+            print(new_x, new_y)
         elif (direction == "R") or (direction == "r"):
             new_x, new_y = x + 1, y
+            if new_x >= self.n:
+                new_x = 9
+            print(new_x, new_y)
         elif (direction == "Q") or (direction == "q"):
             sys.exit(1)  # force terminates the program
         else:
             raise ValueError("Invalid direction")
 
         # Check if the new position is out of bounds
-        if (new_x < 0) or (new_y < 0) or (new_x >= self.n) or (new_y >= self.n):
-            print("Player out of bounds")
-
+        """if (new_x < 0) or (new_y < 0) or (new_x >= self.n) or (new_y >= self.n):
+            print("Player out of bounds", new_x,new_y)
+            raise ValueError("Player out of bounds")
+        """
         # Check if the new position is already occupied by another player
-        for player in self.players:
+        """for player in self.players:
             if player.x == new_x and player.y == new_y:
-                raise ValueError("Position is already occupied by another player")
+                raise ValueError("Position is already occupied by another player")"""
 
         # Update the player's position
         movePlayer.x, movePlayer.y = new_x, new_y
@@ -126,23 +144,43 @@ class Board:
         treasures = self.create_treasures()
         treasuresVal = treasures[0]  # variable initialized to get value of treausre.
         treasure_positions_copy = self.treasurePositions.copy()
-        treasuresToRemove = set()  # Create a set to store treasures to be removed
+
 
         for player in self.players:
+            self.treasuresToRemove.clear()
             x, y = player.x, player.y
 
             for row, col in treasure_positions_copy:
                 if x == col and y == row:
+                    i = 0
                     # Player found treasure at the same coordinates
                     score_to_add = treasuresVal.value
                     self.add_Score(player.name, score_to_add)
                     self.treasuresFound.add((row, col))  # Add the found treasure to the set
+
                     # Print the player's name and updated score
                     print(f"Player {player.name} has found a treasure! Score: {player.score}")
-                    treasuresToRemove.add((row, col))  # Add the treasure to the removal set
+                    self.treasuresToRemove.add((row, col))  # Add the treasure to the removal set
 
-        # Remove the found treasures from the main set
-        for treasure in treasuresToRemove:
-            self.treasurePositions.remove(treasure)
-        if (len(self.treasuresFound) == 5):
-            print(f"Game is over")
+                    # Remove the found treasures from the main set
+                    if (row, col) in self.treasurePositions:
+                        self.treasurePositions.remove((row, col))  # Remove the found treasure from the main set
+
+
+
+
+            """while len(self.treasurePositions) < 5:  # Continue until there are 5 treasures in the set
+                row = random.randint(self.min_val, self.max_val - 1)
+                col = random.randint(self.min_val, self.max_val - 1)
+                new_treasure = (row, col)
+
+                # Ensure that the new treasure is not already in the set
+
+                if new_treasure not in self.treasurePositions:
+                    self.treasurePositions.add(new_treasure)
+                    print(self.treasurePositions)
+            self.treasuresFound.clear()
+            self.treasuresToRemove.clear()"""
+
+
+

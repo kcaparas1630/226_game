@@ -1,10 +1,10 @@
-import pytest
+
 from re import compile
 from socket import socket, AF_INET, SOCK_STREAM
 from struct import unpack
 from subprocess import run
 from time import sleep
-
+import pytest
 
 #
 # DO NOT CHANGE THE CODE BELOW
@@ -152,9 +152,8 @@ def get_scores(result: bytes) -> (int, int):
 
 def get_board() -> ([[str]], int, int):
     result = put_data('F0')
-    print(result)
     score1, score2 = get_scores(result)
-    print(score1,score2)
+    print("The score is",score1)
     assert 0 <= score1 <= 100
     assert 0 <= score2 <= 100
     board = parse_board(result[4:].decode())
@@ -201,6 +200,7 @@ def stroll_along(score1: int, score2: int, dir1: str, dir2: str, dir3: str) -> N
     for _ in range(10):
         for _ in range(10):
             result = put_data(direction + PLAYER1)
+            print(result)
             if result != b'':
                 new_score1, new_score2 = get_scores(result)
                 assert score1 <= new_score1
@@ -215,16 +215,16 @@ def stroll_along(score1: int, score2: int, dir1: str, dir2: str, dir3: str) -> N
         get_board()
 
         direction = dir2 if direction == dir1 else dir1
-
     board, new_score1, new_score2 = get_board()
     for row in board:
         for col in row:
+            print("The col is",col,"The row is", row)
             assert '$' not in col
     assert score1 < new_score1
     assert score2 == new_score2
 
 
-@pytest.mark.parametrize('execution_number', range(1))
+@pytest.mark.parametrize('execution_number', range(2))
 def test_board(execution_number):
     board, score1, score2 = get_board()
     n = len(board)
@@ -236,7 +236,10 @@ def test_board(execution_number):
         for _ in range(10):
             put_data('4' + PLAYER2)
         stroll_along(score1, score2, '6', '4', '2')
+
     else:
+        print(move_right_and_up(PLAYER1,PLAYER1_STR,score1,score2))
+        print(move_left_and_down(PLAYER2,PLAYER2_STR,score1,score2))
         move_right_and_up(PLAYER1, PLAYER1_STR, score1, score2)
         move_left_and_down(PLAYER2, PLAYER2_STR, score1, score2)
         for _ in range(10):

@@ -56,10 +56,11 @@ import test_server
 from Board import Board
 
 class Game:
+
     def __init__(self):
-        self.board_instance = Board(20, 5, 0, 9, 2)
-        self.board_instance.add_player("1", 4, 5)
-        self.board_instance.add_player("2", 5, 5)
+        self.board_instance = Board(10, 5, 0, 9, 2)
+        self.board_instance.add_player("1", 0, 9)
+        self.board_instance.add_player("2", 9,0)
         self.command_mapping = {'U': 0b0010, 'L': 0b0100, 'R': 0b0110, 'D': 0b0011, 'Q': 0b1000, 'G': 0b1111}
 
 
@@ -78,79 +79,84 @@ class Game:
                     sc, address = sock.accept()
                     with sc:
                         print('Client connected:', sc.getpeername())
-
-                        # Receive 1-byte segment
-                        data = sc.recv(1)
-
+                        data = sc.recv(BUF_SIZE)
                         if not data:
                             print('Client disconnected:', address)
                             break
 
-                        # Decode the command, player number, and unused bits
+                        # Decode the command, player number
                         commands = (data[0] & 0xF0) >> 4
-
                         player_number = (data[0] & 0x0C) >> 2
 
                         print(f'Received: Command={commands}, Player={player_number}')
-
                         str_player_number = str(player_number)
                         str_commands = next(key for key, value in self.command_mapping.items() if value == commands)
+                        boardMap = self.board_instance.display()
                         # Handle different commands
                         if commands == 0b0010:  # U
                             self.board_instance.move_player(str_player_number, str_commands)
+                            if len(self.board_instance.treasuresFound) == 5:
+                                self.game_over = True
+                                sc.close()
 
                         elif commands == 0b0100:  # L
                             # Handle L command
                             self.board_instance.move_player(str_player_number, str_commands)
+                            if len(self.board_instance.treasuresFound) == 5:
+                                self.game_over = True
+                                sc.close()
 
                         elif commands == 0b0110:  # R
                             # Handle R command
                             self.board_instance.move_player(str_player_number, str_commands)
+                            if len(self.board_instance.treasuresFound) == 5:
+                                self.game_over = True
+                                sc.close()
 
                         elif commands == 0b0011:  # D
                             # Handle D command
                             self.board_instance.move_player(str_player_number, str_commands)
+                            if len(self.board_instance.treasuresFound) == 5:
+                                self.game_over = True
+                                sc.close()
 
                         elif commands == 0b1000:  # Q
                             # Handle Q command
-                            sock.close()
+                            sc.close()
                             pass
                         elif commands == 0b1111:  # G
                             # Handle G command
-                            boardMap = self.board_instance.display()
                             for row in boardMap:  # creates mapping of the board
                                 print(' '.join(row))
-                            # Convert the boardMap to a UTF-8 encoded string
-                            board_str = ' '.join([' '.join(row) for row in boardMap])
-                            board_bytes = board_str.encode('utf-8')
+
+                                # Check for treasures
                             self.board_instance.check_for_treasure()
+
+                            # Print player scores
                             player1 = self.board_instance.players[0]
                             player2 = self.board_instance.players[1]
-
                             print(f"Player 1 Score: {player1.score}")
                             print(f"Player 2 Score: {player2.score}")
-                            treasures = self.board_instance.create_treasures()
-                            for treasure in treasures:
-                                print(f"Treasure Description: {treasure.description}, Value: {treasure.value}")
-                            self.board_instance.check_for_treasure()
+
+                            # Convert the boardMap to a UTF-8 encoded string
+                            board_str = '\n'.join([' '.join(row) for row in boardMap])
+                            board_bytes = board_str.encode('utf-8')
+
                             # Pack Player 1 and Player 2 scores as unsigned shorts
-                            #packed_scores = struct.pack('!HH', player1.score , player2.score)
                             player_score = struct.pack('!HH', player1.score, player2.score)
                             sc.sendall(player_score + board_bytes)
-                            #self.check_treasures()
-
+                            sc.close()
                             # Send the UTF-8 encoded board to the client
-
-
                         else:
                             print('Unknown command. Closing connection.')
-                            break
-
+                            sc.close()
 
                 except Exception as details:
                     raise details
 
-    def create_client(self,command):
+
+
+    """def create_client(self,command):
         BUF_SIZE = 1024
         HOST = '127.0.0.1'
         PORT = 12345
@@ -221,7 +227,7 @@ class Game:
                 sock.close()
 
     def check_treasures(self):
-        """self.board_instance.check_for_treasure()
+        self.board_instance.check_for_treasure()
         player1 = self.board_instance.players[0]
         player2 = self.board_instance.players[1]
 
@@ -247,10 +253,11 @@ class Game:
         """
 if __name__ == '__main__':
     g = Game()
+    g.create_server()
 
 
 
-    if len(argv) < 2:
+    """if len(argv) < 2:
         print(f'Usage: {argv[0]} + <command>')
         exit()
 
@@ -262,4 +269,4 @@ if __name__ == '__main__':
         g.create_server()
 
     else:
-        g.create_client(command)
+        g.create_client(command)"""
