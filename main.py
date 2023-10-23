@@ -52,15 +52,15 @@ from socket import socket, AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR
 from sys import argv
 import struct
 
-import test_server
+
 from Board import Board
 
 class Game:
 
     def __init__(self):
         self.board_instance = Board(10, 5, 0, 9, 2)
-        self.board_instance.add_player("1", 0, 9)
-        self.board_instance.add_player("2", 9,0)
+        self.board_instance.add_player("1", 0, 1)
+        self.board_instance.add_player("2", 9,1)
         self.command_mapping = {'U': 0b0010, 'L': 0b0100, 'R': 0b0110, 'D': 0b0011, 'Q': 0b1000, 'G': 0b1111}
 
 
@@ -97,33 +97,29 @@ class Game:
                             self.board_instance.move_player(str_player_number, str_commands)
                             if len(self.board_instance.treasuresFound) == 5:
                                 self.game_over = True
-                                sc.close()
 
                         elif commands == 0b0100:  # L
                             # Handle L command
                             self.board_instance.move_player(str_player_number, str_commands)
                             if len(self.board_instance.treasuresFound) == 5:
                                 self.game_over = True
-                                sc.close()
 
                         elif commands == 0b0110:  # R
                             # Handle R command
                             self.board_instance.move_player(str_player_number, str_commands)
                             if len(self.board_instance.treasuresFound) == 5:
                                 self.game_over = True
-                                sc.close()
 
                         elif commands == 0b0011:  # D
                             # Handle D command
                             self.board_instance.move_player(str_player_number, str_commands)
                             if len(self.board_instance.treasuresFound) == 5:
                                 self.game_over = True
-                                sc.close()
 
                         elif commands == 0b1000:  # Q
                             # Handle Q command
                             sc.close()
-                            pass
+                            break
                         elif commands == 0b1111:  # G
                             # Handle G command
                             for row in boardMap:  # creates mapping of the board
@@ -150,6 +146,7 @@ class Game:
                         else:
                             print('Unknown command. Closing connection.')
                             sc.close()
+                            break
 
                 except Exception as details:
                     raise details

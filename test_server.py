@@ -218,18 +218,18 @@ def stroll_along(score1: int, score2: int, dir1: str, dir2: str, dir3: str) -> N
     board, new_score1, new_score2 = get_board()
     for row in board:
         for col in row:
-            print("The col is",col,"The row is", row)
             assert '$' not in col
     assert score1 < new_score1
     assert score2 == new_score2
 
 
-@pytest.mark.parametrize('execution_number', range(2))
+@pytest.mark.parametrize('execution_number', range(10))
 def test_board(execution_number):
     board, score1, score2 = get_board()
     n = len(board)
     p1_loc = find_player(PLAYER1_STR, n, board)
     p2_loc = find_player(PLAYER2_STR, n, board)
+    print("P1 Is in", p1_loc, "P2 is in", p2_loc)
     if p1_loc > p2_loc:
         move_left_and_down(PLAYER1, PLAYER1_STR, score1, score2)
         move_right_and_up(PLAYER2, PLAYER2_STR, score1, score2)
