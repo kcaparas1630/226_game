@@ -166,7 +166,8 @@ class Board:
                     if (row, col) in self.treasurePositions:
                         self.treasurePositions.remove((row, col))  # Remove the found treasure from the main set
 
-
+            if len(self.treasuresFound) == 5:
+                self.game_over = True
 
 
             """while len(self.treasurePositions) < 5:  # Continue until there are 5 treasures in the set
