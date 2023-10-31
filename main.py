@@ -58,14 +58,16 @@ class Game:
         while True:
             sc, address = self.sock.accept()
             if len(self.containers) == 0:
+                print("goes1")
                 self.containers[0] = sc
-                headers = struct.pack('!H', len(b'\x01'))
-                sc.send(headers + b'\x01')
+                headers = struct.pack('!H', 1)
+                sc.sendall(headers + b'\x01')
                 # threading.Thread(target = self.listenToClient, args=(sc,address)).start()
             elif len(self.containers) == 1:
+                print("goes2")
                 self.containers[1] = sc
-                headers = struct.pack('!H', len(b'\x02'))
-                sc.send(headers + b'\x02')
+                headers = struct.pack('!H', 2)
+                sc.sendall(headers + b'\x02')
             else:
                 print("goes here?")
                 headers = struct.pack('!H', len(b'\x03'))

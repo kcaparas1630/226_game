@@ -16,7 +16,7 @@ def create_client():
             if response == b'\x00\x03':
                 print("Connection refused by the server.")
                 return
-
+            print(response)
             while True:
                 command_bits = b''
                 command = input("Enter a command:")
