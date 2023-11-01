@@ -12,8 +12,8 @@ def create_client():
         try:
             sock.connect((HOST,PORT))
             print('Client: ', sock.getsockname())
-            response = sock.recv(2)
-            if response == b'\x00\x03':
+            response = sock.recv(3)
+            if response == b'\x00\x01\x03':
                 print("Connection refused by the server.")
                 return
             print(response)
@@ -21,24 +21,24 @@ def create_client():
                 command_bits = b''
                 command = input("Enter a command:")
                 if command == 'U':
-                    if response == b'\x00\x01':
+                    if response == b'\x00\x01\x01':
                         command_bits = bytes([0b00100100])
-                    elif response == b'\x00\x02':
+                    elif response == b'\x00\x01\x02':
                         command_bits = bytes([0b00101000])
                 elif command == 'L':
-                    if response == b'\x00\x01':
+                    if response == b'\x00\x01\x01':
                         command_bits = bytes([0b01000100])
-                    elif response == b'\x00\x02':
+                    elif response == b'\x00\x01\x02':
                         command_bits = bytes([0b01001000])
                 elif command == 'R':
-                    if response == b'\x00\x01':
+                    if response == b'\x00\x01\x01':
                         command_bits = bytes([0b01100100])
-                    elif response == b'\x00\x02':
+                    elif response == b'\x00\x01\x02':
                         command_bits = bytes([0b01101000])
                 elif command == 'D':
-                    if response == b'\x00\x01':
+                    if response == b'\x00\x01\x01':
                         command_bits = bytes([0b00110100])
-                    elif response == b'\x00\x02':
+                    elif response == b'\x00\x01\x02':
                         command_bits = bytes([0b00111000])
                 elif command == 'Q':
                     command_bits = bytes([0b10000100])
