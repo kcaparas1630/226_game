@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Game Display</title>
+    <style>
+        /* Add styling for the game board/grid */
+        /* You can style the grid cells, board layout, etc. here */
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Game!</h1>
+    <p>Choose your player:</p>
+    <form action="{% url 'move_player' player_id=1 %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="player_choice" value="1">
+        <button type="submit">Player 1</button>
+    </form>
+    <form action="{% url 'move_player' player_id=2 %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="player_choice" value="2">
+        <button type="submit">Player 2</button>
+    </form>
+    <div class="game-board">
+        <!-- Display the game board as a grid -->
+        <!-- You can use HTML/CSS to create a grid layout -->
+        <!-- For example: -->
+        <table>
+            <!-- Loop through rows and columns to display the board -->
+            {% for row in board %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
