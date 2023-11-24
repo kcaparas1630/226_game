@@ -98,13 +98,17 @@ def move_player(request, player_id):
     old_row = player.row
     old_col = player.col
 
-    if direction == 'up':
+    # Store the board's dimensions (assuming 10x10 grid)
+    max_rows = 10
+    max_columns = 10
+
+    if direction == 'up' and player.row > 0:
         player.row -= 1
-    elif direction == 'down':
+    elif direction == 'down' and player.row < max_rows - 1:
         player.row += 1
-    elif direction == 'left':
+    elif direction == 'left' and player.col > 0:
         player.col -= 1
-    elif direction == 'right':
+    elif direction == 'right' and player.col < max_columns - 1:
         player.col += 1
 
     # Save the updated player position back to the database
@@ -117,31 +121,36 @@ def move_player(request, player_id):
         old_cell.save()
     except Board.DoesNotExist:
         print(f"Old cell at row {old_row}, column {old_col} does not exist.")
+
+    # Initialize player1 and player2 as None
+    player1 = None
+    player2 = None
+
     # Retrieve player scores
-    player1 = Player.objects.get(name='1')
-    player2 = Player.objects.get(name='2')
     try:
+        player1 = Player.objects.get(name='1')
+        player2 = Player.objects.get(name='2')
+
         new_cell = Board.objects.get(row=player.row, column=player.col)
         if new_cell.label == '$':  # Check if the player landed on a treasure cell
             player.score += new_cell.value  # Increment player's score by treasure value
             new_cell.label = f'{player_id}'  # Set the label to the player's identifier
             player.save()
             new_cell.save()
-
             # Check if all treasures are found
             remaining_treasures = Board.objects.filter(label='$').count()
             if remaining_treasures == 0:
                 if player1.score > player2.score:
-                    # All treasures found, end the game or perform necessary actions
                     return HttpResponse("Game Over, All treasures found! Player 1 won!")
                 else:
-                    # All treasures found, end the game or perform necessary actions
                     return HttpResponse("Game Over, All treasures found! Player 2 won!")
         else:
             new_cell.label = f'{player_id}'  # Set the label to the player's identifier
             new_cell.save()
     except Board.DoesNotExist:
         print(f"New cell at row {player.row}, column {player.col} does not exist.")
+    except Player.DoesNotExist:
+        print("Player does not exist.")
 
     # Retrieve the updated board data from the database
     board_data = []
@@ -155,15 +164,10 @@ def move_player(request, player_id):
             row_data.append(cell)
         board_data.append(row_data)
 
+    # Retrieve player scores after the movement
+    player1 = Player.objects.get(name='1')
+    player2 = Player.objects.get(name='2')
 
-
-    if new_cell.label == '$':
-        if player_id == '1':
-            player1.score += new_cell.value
-            player1.save()
-        else:
-            player2.score += new_cell.value
-            player2.save()
 
     # Render the template with the properly formatted board data
     return render(request, 'game/game_display.html', {
