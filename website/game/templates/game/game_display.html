@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Board</title>
+    <style>
+        /* Add CSS for styling the board cells, players, and treasures */
+        /* Example styles */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+        }
+        .cell {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ccc;
+            text-align: center;
+            line-height: 50px;
+        }
+        .treasure {
+            background-color: gold;
+        }
+        .player {
+            background-color: cyan;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Board</h1>
+    <div class="game-board">
+        <!-- Display the game board as a grid -->
+        <!-- You can use HTML/CSS to create a grid layout -->
+        <!-- For example: -->
+        <table>
+            <!-- Loop through rows and columns to display the board -->
+            {% for row in board %}
+            <tr>
+                {% for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <p>Player 1 Score: {{ player1_score }}</p>
+    <p>Player 2 Score: {{ player2_score }}</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit" name="direction" value="up">Up</button>
+        <br>
+        <button type="submit" name="direction" value="left">Left</button>
+        <button type="submit" name="direction" value="right">Right</button>
+        <br>
+        <button type="submit" name="direction" value="down">Down</button>
+    </form>
+
+</body>
+
+</html>
